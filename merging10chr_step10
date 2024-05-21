@@ -1,0 +1,13 @@
+ml gatk4/4.1
+java -Xmx200g -XX:ParallelGCThreads=10 -jar $GATKPATH GatherVcfs \
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed01.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed02.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed03.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed04.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed05.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed06.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed07.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed08.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed09.vcf.gz
+-I /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed10.vcf.gz
+-O /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/final_output/merge.vcf
