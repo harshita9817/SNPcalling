@@ -2,7 +2,7 @@ ml samtools
 #ml bwa
 ml star
 
-cd /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/out.trim
+cd /{output_from_trimmomatic}
 for i in *_1_paired.fastq.gz;
 do 
 base=`basename $i _1_paired.fastq.gz`
