@@ -1,0 +1,16 @@
+plot2name = {}
+fh = open("translationtable.csv")
+for x in fh:
+    y = x.strip().split(',')
+    plot2name[y[1]] = y[2]
+
+fh = open("SbDiv_imputed.vcf")
+header = fh.readline().strip().replace('"','').split(' ')
+print(",".join(header))
+for x in fh:
+    y = x.strip().replace('"','').split(' ')
+    mygeno = y[1]
+    mynewgeno = plot2name[y[1]]
+    myexps = y[2:]
+    myplist = [mynewgeno] + myexps
+    print(",".join(myplist))
