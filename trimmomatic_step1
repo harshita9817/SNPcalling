@@ -1,0 +1,8 @@
+ml load trimmomatic/0.33
+ml load java/12
+
+samplesheet="lines.txt"
+f=`sed -n "$SLURM_ARRAY_TASK_ID"p $samplesheet |  awk '{print $1}'`
+output=`echo ${f} | cut -d'/' -f4-`
+
+java -jar $TM_HOME/trimmomatic.jar PE -phred33 ${f}_1.fastq.gz ${f}_2.fastq.gz  out.trimm/${output}_1_paired.fastq.gz out.trimm/${output}_1_unpaired.fastq.gz out.trimm/${output}_2_paired.fastq.gz out.trimm/${output}_2_unpaired.fastq.gz ILLUMINACLIP:TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:35
