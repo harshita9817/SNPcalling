@@ -1,0 +1,14 @@
+ml samtools
+#ml bwa
+ml star
+
+cd /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/out.trim
+for i in *_1_paired.fastq.gz;
+do 
+base=`basename $i _1_paired.fastq.gz`
+STAR --runThreadN 24 --genomeDir /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/genomeDir/ --outSAMmultNmax 1 --outFileNamePrefix /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output2/${base} --readFilesCommand gunzip -c --readFilesIn ${base}_1_paired.fastq.gz ${base}_2_paired.fastq.gz
+STAR --runThreadN 20 --genomeDir /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/genomeDir/ --outFileNamePrefix /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output2/${base} --readFilesCommand gunzip -c --readFilesIn ${base}_1_paired.fastq.gz ${base}_2_paired.fastq.gz --outSAMtype BAM SortedByCoordinate --outFilterMismatchNmax 30 --outFilterScoreMinOverLread 0.1 --outFilterMatchNminOverLread 0.1 --seedSearchStartLmax 20
+
+samtools index /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output2/${base}.sorted.bam
+
+done
