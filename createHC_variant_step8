@@ -1,0 +1,11 @@
+ml bcftools
+
+chr=$SLURM_ARRAY_TASK_ID
+
+bcftools annotate /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_snp_filtered1.vcf.gz -x 'FORMAT' |\
+bcftools view -i 'F_MISSING<0.5 & MAF>0.01 & DP>748' -m2 -M2 -Ov |\
+bcftools norm -d all -Oz -o /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/hc_variant.vcf.gz
+bcftools filter /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/hc_variant.vcf.gz --exclude 'F_PASS(GT=="het") > 0.1' -o /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/SbDiv_filtering.vcf.gz
+
+ml tabix
+tabix /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/SbDiv_filtering.vcf.gz
