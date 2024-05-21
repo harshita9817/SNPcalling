@@ -1,0 +1,44 @@
+ml java/1.8
+ml gatk4/4.1
+ml bcftools
+ml tabix
+
+tabix /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01.vcf.gz
+
+# Filter INDELS
+gatk SelectVariants \
+-V /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01.vcf.gz \
+-select-type INDEL \
+-O /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_indels.vcf.gz
+
+gatk VariantFiltration \
+-V /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_indels.vcf.gz \
+-filter "QD < 2.0" --filter-name "QD2" \
+-filter "QUAL < 30.0" --filter-name "QUAL30" \
+-filter "FS > 200.0" --filter-name "FS200" \
+-filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20" \
+-O /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_indels_filtered_.vcf.gz
+
+bcftools +setGT /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_indels_filtered_.vcf.gz -- -t q -n . -i 'FMT/DP=0' | bcftools view -f PASS -Ov | bcftools annotate --set-id +'%CHROM\_%POS' -O z -o /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_indels_filtered_.vcf.gz
+tabix /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_indels_filtered_.vcf.gz
+
+# Filter SNPs
+
+gatk SelectVariants \
+-V /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01.vcf.gz  \
+-select-type SNP \
+-O /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_snp.vcf.gz
+
+gatk VariantFiltration \
+-V /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_snp.vcf.gz \
+-filter "QD < 2.0" --filter-name "QD2" \
+-filter "QUAL < 30.0" --filter-name "QUAL30" \
+-filter "SOR > 3.0" --filter-name "SOR3" \
+-filter "FS > 60.0" --filter-name "FS60" \
+-filter "MQ < 40.0" --filter-name "MQ40" \
+-filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
+-filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
+-O /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_snp1.vcf.gz
+
+bcftools +setGT /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_snp1.vcf.gz -- -t q -n . -i 'FMT/DP=0' | bcftools view -f PASS -Ov | bcftools annotate --set-id +'%CHROM\_%POS' -O z -o /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_snp_filtered1.vcf.gz
+tabix /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01_snp_filtered1.vcf.gz
