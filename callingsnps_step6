@@ -1,0 +1,5 @@
+ml gatk4/4.1
+gatk --java-options "-Xmx4g" GenotypeGVCFs \
+   -R /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/Sorghum_v5_repeatmaskedpseudomolecules_homemade.fa\
+   -V /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/combined.g.vcf\
+   -O /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/final_chr01.vcf.gz
