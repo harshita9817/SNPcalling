@@ -1,0 +1,6 @@
+
+ml java/1.8
+java -Xmx1000g -jar /work/schnablelab/harshita/soft/beagle/beagle.19Apr22.7c0.jar gt=/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/imputation/SbDiv_filtering10.vcf out=/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed10
+
+ml tabix
+tabix /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/impute_output/imputed10.vcf.gz
