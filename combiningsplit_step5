@@ -1,0 +1,7 @@
+chr="01"
+module load gatk4/4.1
+cd /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf
+
+gatk --java-options '-Djava.io.tmpdir:/scratch/$SLURM_JOBID -Xms512m -Xmx200g' CombineGVCFs -R /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/Sorghum_v5_repeatmaskedpseudomolecules_homemade.fa --variant lines01.list -O /work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/mergedlines/combined_chr01/combined.g.vcf
+
+################################################################################################################each chromosome should be combined and should have 10 files in all.  
