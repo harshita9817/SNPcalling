@@ -1,0 +1,56 @@
+import os, sys
+import numpy as np
+import subprocess as sp
+
+BamDir = '/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/sorted_cigar_afterbambai'
+ref = '/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/genomeDir/Sbicolor_730_v5.0.hardmasked.fa' 
+VcfDir = '/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/output_gvcf/gvcf_10' 
+intervalfile = '/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/intervals/Chr10.intervals.bed'
+
+DoneList = [afile.split('.')[0] for afile in os.listdir(VcfDir) if afile.endswith('.g.vcf.idx')]
+#print(DoneList)
+finList=[]
+for asample in os.listdir(BamDir):
+        if asample.endswith('_RG_dedup_SplitNCigar_reorder.bam'):
+           if not asample.split('RG_')[0] in DoneList: 
+                finList.append(BamDir+'/'+asample) #.replace('.bai','.bam'))
+print('todoList: ', len(finList),finList)
+
+inv = np.arange(0,len(finList), 5)
+invList = np.append(inv, len(finList))
+
+for i, a in enumerate(invList[:-1]):
+    ed = invList[i+1]
+    sList = finList[a:ed]
+    cList = []
+    for fin in sList:
+        sampleName = fin.split('/')[-1].split('_RG_')[0]
+        VcfOut = VcfDir+'/'+'{0}_.g.vcf'.format(sampleName)
+        commandLine = 'gatk --java-options "-Xmx30g" HaplotypeCaller -R {0} -I {1} -O {2} -L {3} -ERC BP_RESOLUTION --all-site-pls true --standard-min-confidence-threshold-for-calling 20'.format(ref,fin,VcfOut,intervalfile)
+        cList.append(commandLine)
+
+    slurmName = 'HPC_GVCF.slurm'
+    slurm=open(slurmName,'w')
+    slurm.write('#!/bin/sh\n' + 
+                '#SBATCH --time=7-00:00:00\n' +
+                '#SBATCH --mem=50G\n' +
+                '#SBATCH --mail-user=hmangal2@huskers.unl.edu\n' +
+                '#SBATCH --job-name=gvcf_{0}\n'.format(str(i)) +
+                '#SBATCH --mail-type=ALL\n'
+                '#SBATCH --error=/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/errorlog_10/{0}.err\n'.format(str(i)) +
+                '#SBATCH --output=/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/errorlog_10/{0}.err\n{0}.out\n'.format(str(i)) +
+                'module load gatk4/4.1\n')
+        #this command output the sites included in the bed file
+    slurm.write('\n'.join(cList))
+    slurm.close()
+    sp.call('sbatch -p jclarke,batch,guest HPC_GVCF.slurm',shell=True)
+
+    #################################################################################################################################################################
+
+
+
+ml python
+
+python 	gVCF_chr3_block1_test.py
+
+    
