@@ -1,0 +1,67 @@
+import os, sys, subprocess as sp, numpy as np
+
+ref = '/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/genomeDir/Sbicolor_730_v5.0.hardmasked.fa'
+refDict = '/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/genomeDir/Sbicolor_730_v5.0.hardmasked.dict'
+BamSorted = sys.argv[1] 
+outdir = sys.argv[2] 
+
+rDict={}
+	
+BamList = [afile.split('.')[0] for afile in os.listdir(BamSorted) if afile.endswith('.bam')]
+DoneList = [x.split('_RG_')[0] for x in os.listdir(outdir) if x.endswith('_RG_dedup_SplitNCigar_reorder.bai')]
+print('BamSample:', BamList[:10])
+print('DoneSample:', DoneList, 'are done')
+
+todoList = [x for x in BamList if not x in DoneList] 
+todoList.sort()
+print(todoList, 'need to process')
+todoList2 = []
+for x in todoList:
+    todoList2.append(x+".sortedByCoord.out")
+interval = list(np.arange(0,len(todoList),5))
+interval.append(len(todoList))
+
+
+ml python/3.9
+
+python Preprocess.py /inputfolder(bamfiles) /outputfolder(bamsortedcigar)
+
+
+#################################################################################################################################################################################################
+for i, a in enumerate(interval[:-1]):
+	slurm = open('ProcessRNA_BAM.slurm','w')
+	slurm.write('#!/bin/sh\n' +
+		    '#SBATCH --time=5-00:00:00\n' +
+            	    '#SBATCH --mem=50G\n' + 
+            	    '#SBATCH --mail-user=hmangal2@huskers.unl.edu\n'+
+            	    '#SBATCH --mail-type=ALL\n' + 
+            	    '#SBATCH --job-name={0}\n'.format(str(i)) +
+            	    '#SBATCH --error=/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/errorlog01/{0}.err\n'.format(str(i)) +
+            	    '#SBATCH --output=/work/schnablelab/harshita/TWAS/SNPcalling/SNPcalling_correct_ref_file/STAR/STARAlgin/errorlog01/{0}.out\n'.format(str(i)) + 
+	    	    'module load gatk4\n'+
+            	    'module load picard\n' )
+	for asp in todoList2[a:interval[i+1]]:
+		print(asp)
+		RG = asp
+		fin = BamSorted + '/' + asp + '.bam'
+		bamRG = outdir + '/' + RG + '_RG.bam'
+		AddRG = 'picard -Xmx20g AddOrReplaceReadGroups -I {0} -RGID 1 -RGLB lib1 -RGPL illumina -RGPU unit1 -RGSM {1} -O {2}'.format(fin, RG, bamRG)	
+		bamDedup = bamRG[:-4]  + '_dedup.bam'
+		MarkDuplicate = 'picard -Xmx20g MarkDuplicates -INPUT {0} -OUTPUT {1} -METRICS_FILE metrics.txt -VALIDATION_STRINGENCY SILENT -CREATE_INDEX true'.format(bamRG, bamDedup)	
+		bamSplitNCigar = bamDedup[:-4] + '_SplitNCigar.bam'
+		SplitNCigar = 'gatk --java-options "-Xmx20g" SplitNCigarReads -R {0} -I {1} -O {2} --create-output-bam-index true'.format(ref, bamDedup, bamSplitNCigar)
+		bamReorder =  bamSplitNCigar[:-4] + '_reorder.bam'
+		ReorderBam = 'picard -Xmx16g ReorderSam -INPUT {0} -OUTPUT {1} -R {2} -VALIDATION_STRINGENCY SILENT -SEQUENCE_DICTIONARY {3} -CREATE_INDEX true'.format(bamSplitNCigar, bamReorder, ref, refDict)
+		#print(MarkDuplicate)
+		#print(AddRG)
+		#print(SplitNCigar)
+		#print(ReorderBam)
+		slurm.write(AddRG + '\n')
+		slurm.write(MarkDuplicate + '\n')
+		slurm.write(SplitNCigar + '\n') 
+		slurm.write(ReorderBam + '\n')
+		slurm.write('rm '+bamRG + '\n')
+		slurm.write('rm '+bamDedup + '\n')
+		slurm.write('rm '+bamSplitNCigar + '\n')
+	slurm.close()        
+	sp.call('sbatch -p jclarke,guest,batch ProcessRNA_BAM.slurm', shell=True)
