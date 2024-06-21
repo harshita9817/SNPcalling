@@ -21,13 +21,6 @@ for x in todoList:
 interval = list(np.arange(0,len(todoList),5))
 interval.append(len(todoList))
 
-
-ml python/3.9
-
-python Preprocess.py /inputfolder(bamfiles) /outputfolder(bamsortedcigar)
-
-
-#################################################################################################################################################################################################
 for i, a in enumerate(interval[:-1]):
 	slurm = open('ProcessRNA_BAM.slurm','w')
 	slurm.write('#!/bin/sh\n' +
@@ -65,3 +58,12 @@ for i, a in enumerate(interval[:-1]):
 		slurm.write('rm '+bamSplitNCigar + '\n')
 	slurm.close()        
 	sp.call('sbatch -p jclarke,guest,batch ProcessRNA_BAM.slurm', shell=True)
+######################################################################################################################################################
+
+using this in slurm file
+ml python/3.9
+
+python Preprocess.py /inputfolder(bamfiles) /outputfolder(bamsortedcigar)
+
+
+#################################################################################################################################################################################################
